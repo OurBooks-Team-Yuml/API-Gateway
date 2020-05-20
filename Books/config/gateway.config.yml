@@ -1,0 +1,108 @@
+http:
+  port: 8000
+
+apiEndpoints:
+  books_authorized:
+    host: 'localhost'
+    path: '/books/authorized/'
+
+  books_secured:
+    host: 'localhost'
+    path: '/books/secured/'
+
+  search:
+    host: 'localhost'
+    path: '/search'
+
+serviceEndpoints:
+  books_authorized:
+    url: 'http://web:8001'
+
+  books_secured:
+    url: 'http://web:8001'
+
+  search:
+    url: 'http://search-app:8003'
+
+policies:
+  - log
+  - proxy
+  - cors
+  - auth0
+  - request-transformer
+
+pipelines:
+  booksAuthorizedPipeline:
+    apiEndpoints:
+      - books_authorized
+    policies:
+      -
+        cors:
+        -
+          action:
+            origin: '*'
+            credentials: true
+      -
+        log:
+          -
+            action:
+              message: 'users ${req.method}'
+      -
+        proxy:
+          -
+            action:
+              serviceEndpoint: books_authorized
+
+  booksSecuredPipeline:
+    apiEndpoints:
+      - books_secured
+    policies:
+      -
+        auth0:
+          -
+            action:
+              domain: 'https://dev-b5gefs5h.eu.auth0.com'
+      -
+        cors:
+          -
+            action:
+              origin: '*'
+              credentials: true
+      -
+        log:
+          -
+            action:
+              message: 'users ${req.method}'
+      -
+        request-transformer:
+          -
+            action:
+              body:
+                add:
+                  user: req.user
+      -
+        proxy:
+        -
+          action:
+            serviceEndpoint: books_secured
+
+  searchPipeline:
+    apiEndpoints:
+      - search
+    policies:
+      -
+        cors:
+          -
+            action:
+              origin: '*'
+              credentials: true
+      -
+        log:
+        -
+          action:
+            message: 'users ${req.method}'
+      -
+        proxy:
+        -
+          action:
+            serviceEndpoint: search
