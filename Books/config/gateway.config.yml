@@ -14,6 +14,10 @@ apiEndpoints:
     host: 'localhost'
     path: '/search'
 
+  read:
+      host: 'localhost'
+      path: '/reads'
+
 serviceEndpoints:
   books_authorized:
     url: 'http://web:8001'
@@ -23,6 +27,9 @@ serviceEndpoints:
 
   search:
     url: 'http://search-app:8003'
+
+  read:
+    url: 'http://read-ms:8890'
 
 policies:
   - log
@@ -38,10 +45,10 @@ pipelines:
     policies:
       -
         cors:
-        -
-          action:
-            origin: '*'
-            credentials: true
+          -
+            action:
+              origin: '*'
+              credentials: true
       -
         log:
           -
@@ -82,9 +89,9 @@ pipelines:
                   user: req.user
       -
         proxy:
-        -
-          action:
-            serviceEndpoint: books_secured
+          -
+            action:
+              serviceEndpoint: books_secured
 
   searchPipeline:
     apiEndpoints:
@@ -98,11 +105,44 @@ pipelines:
               credentials: true
       -
         log:
-        -
-          action:
-            message: 'users ${req.method}'
+          -
+            action:
+              message: 'users ${req.method}'
       -
         proxy:
         -
           action:
             serviceEndpoint: search
+
+  readmsPipeline:
+    apiEndpoints:
+      - read
+    policies:
+      -
+        auth0:
+          -
+            action:
+              domain: 'https://dev-b5gefs5h.eu.auth0.com'
+      -
+        cors:
+          -
+            action:
+              origin: '*'
+              credentials: true
+      -
+        log:
+          -
+            action:
+              message: 'users ${req.method}'
+      -
+        request-transformer:
+          -
+            action:
+              body:
+                add:
+                  user: req.user
+      -
+        proxy:
+          -
+            action:
+              serviceEndpoint: read
