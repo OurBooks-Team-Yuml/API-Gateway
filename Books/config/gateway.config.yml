@@ -58,16 +58,16 @@ pipelines:
       - books_secured
     policies:
       -
-        auth0:
-          -
-            action:
-              domain: 'https://dev-b5gefs5h.eu.auth0.com'
-      -
         cors:
           -
             action:
               origin: '*'
               credentials: true
+      -
+        auth0:
+          -
+            action:
+              domain: 'https://dev-b5gefs5h.eu.auth0.com'
       -
         log:
           -
