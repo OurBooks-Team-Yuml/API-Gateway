@@ -7,6 +7,6 @@
   "main": "server.js",
   "dependencies": {
     "express-gateway": "^1.16.10",
-    "express-gateway-plugin-auth0": "0.0.6"
+    "express-gateway-plugin-auth0": "1.0.1"
   }
 }

@@ -77,7 +77,7 @@ pipelines:
         request-transformer:
           -
             action:
-              body:
+              headers:
                 add:
                   user: req.user
       -
